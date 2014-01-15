@@ -12,12 +12,15 @@ def computeTable(generator):
             table[entity].add((pid, value))
     return table
 
-def computeIntersection(table, setList):
+def computeRelations(table, itemList):
+    setList = []
+    for item in itemList:
+        setList.append(set(table[item]))
     #todo: Compute in database!?!
     intersection = setList[0].intersection(*setList[1:])
     return intersection
 
-def rankTuples(tupleSet):
+def rankRelations(table, tupleSet):
     result = []
     for t in tupleSet:
         i = 0
@@ -28,8 +31,6 @@ def rankTuples(tupleSet):
     result = sorted(result, key=lambda t: t[2])
     return result
 
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="this program finds relations between a list of wikidata-items")
     parser.add_argument("input", help="The CSV input file (wikidata triple)", type=CompressedFileType("r"))
@@ -38,15 +39,12 @@ if __name__ == "__main__":
     print "computing table..."
     table = computeTable(ItemRelationsCsvReader.read_csv(args.input))
     itemList = args.itemList.split(",")
-    setList = []
     print "finding relations..."
-    for item in itemList:
-        setList.append(set(table[item]))
-    result = computeIntersection(table, setList)
+    result = computeRelations(table, itemList)
     print "ranking relations..."
-    result = rankTuples(result)
+    result = rankRelations(table, result)
     print result
-    if len(itemList)==2:
-        pass
+    #if len(itemList)==2:
+    #    pass...
     
 
